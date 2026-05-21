@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Language Translator</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      background:#f4f4f4;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+
+    .container{
+      width:400px;
+      background:white;
+      padding:25px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.2);
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:20px;
+    }
+
+    textarea{
+      width:100%;
+      height:100px;
+      padding:10px;
+      resize:none;
+      margin-bottom:15px;
+      border:1px solid #ccc;
+      border-radius:5px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      margin-bottom:15px;
+    }
+
+    select{
+      width:50%;
+      padding:10px;
+      border-radius:5px;
+      border:1px solid #ccc;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      background:#007bff;
+      color:white;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-size:16px;
+    }
+
+    button:hover{
+      background:#0056b3;
+    }
+
+    #outputText{
+      margin-top:15px;
+      background:#f0f0f0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h2>Language Translator</h2>
+
+    <textarea id="inputText" placeholder="Enter text here..."></textarea>
+
+    <div class="row">
+      <select id="sourceLang">
+        <option value="en">English</option>
+        <option value="ur">Urdu</option>
+        <option value="fr">French</option>
+        <option value="es">Spanish</option>
+      </select>
+
+      <select id="targetLang">
+        <option value="ur">Urdu</option>
+        <option value="en">English</option>
+        <option value="fr">French</option>
+        <option value="es">Spanish</option>
+      </select>
+    </div>
+
+    <button onclick="translateText()">Translate</button>
+
+    <textarea id="outputText" placeholder="Translated text..." readonly></textarea>
+
+  </div>
+
+  <script>
+
+    async function translateText(){
+
+      let text = document.getElementById("inputText").value;
+      let source = document.getElementById("sourceLang").value;
+      let target = document.getElementById("targetLang").value;
+
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
+
+      try{
+
+        let response = await fetch(url);
+        let data = await response.json();
+
+        document.getElementById("outputText").value = data[0][0][0];
+
+      }
+
+      catch(error){
+
+        alert("Translation Failed!");
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
