@@ -1,0 +1,83 @@
+import nltk
+import string
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.corpus import stopwords
+
+# First time only
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# -------------------------
+# FAQ DATA
+# -------------------------
+faqs = [
+    "What is Python programming?",
+    "What is Artificial Intelligence?",
+    "What is Machine Learning?",
+    "What is a chatbot?",
+    "How does AI work?",
+    "What is NLP?"
+]
+
+answers = [
+    "Python is a powerful and easy programming language.",
+    "AI is technology that makes machines think like humans.",
+    "Machine Learning is a part of AI that learns from data.",
+    "A chatbot is a program that chats with users automatically.",
+    "AI works by using data and algorithms to simulate human intelligence.",
+    "NLP helps computers understand human language."
+]
+
+# -------------------------
+# TEXT PREPROCESSING (SMART CLEANING)
+# -------------------------
+stop_words = set(stopwords.words('english'))
+
+def clean_text(text):
+    text = text.lower()
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    words = nltk.word_tokenize(text)
+    words = [w for w in words if w not in stop_words]
+    return " ".join(words)
+
+clean_faqs = [clean_text(q) for q in faqs]
+
+# -------------------------
+# VECTORIZE
+# -------------------------
+vectorizer = TfidfVectorizer()
+faq_vectors = vectorizer.fit_transform(clean_faqs)
+
+# -------------------------
+# CHATBOT FUNCTION
+# -------------------------
+def chatbot(user_input):
+    user_input = clean_text(user_input)
+
+    user_vector = vectorizer.transform([user_input])
+
+    similarity = cosine_similarity(user_vector, faq_vectors)
+
+    best_match = similarity.argmax()
+    score = similarity[0][best_match]
+
+    # Confidence check (smart feature)
+    if score < 0.2:
+        return "Sorry, I don't understand your question."
+
+    return answers[best_match]
+
+# -------------------------
+# CHAT LOOP
+# -------------------------
+print("🤖 Smart FAQ Chatbot is running... (type 'exit' to stop)\n")
+
+while True:
+    user = input("You: ")
+
+    if user.lower() == "exit":
+        print("Bot: Goodbye!")
+        break
+
+    print("Bot:", chatbot(user))
